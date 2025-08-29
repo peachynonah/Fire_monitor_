@@ -112,7 +112,6 @@ std::array<double,3> PDController::calculateTau(int index, double theta_desired_
 //     return tau_deriv[index];
 //}
 
-
 FLController::FLController() {
     // Initialize gains
     Kp_FL[0] = 2500.0; Kp_FL[1] = 0.0;
