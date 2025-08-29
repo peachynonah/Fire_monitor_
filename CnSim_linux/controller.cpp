@@ -8,32 +8,9 @@ using namespace std;
 
 ModelDynamics m_model_dynamics;
 
-// functions
-double torque_saturate(double torque, double max_torque_norm) {
-    double max_torque = max_torque_norm;
-    double min_torque = -max_torque_norm;
-
-    if (torque > max_torque) {
-        return max_torque;
-    } else if (torque < min_torque) {
-        return min_torque;
-    }
-    
-    return torque;
-}
-
-double Nm_to_permil(double tau, double gear_ratio){    
-    tau = 1e3* tau; // Nm to mNm
-    tau = (tau/gear_ratio);
-    tau = ((1e3 / 52.8)* tau);
-
-    return tau;
-}
-
 
 
 RealWorldConfigurer::RealWorldConfigurer(){
-
 }
 
 double RealWorldConfigurer::Nm_to_permil(double tau_in_Nm_linkside, double gear_ratio){
@@ -62,11 +39,13 @@ double RealWorldConfigurer::InvertTorquesign(double torque_before_inverted){
     return torque_inverted;
 }
 
-// double get_velocity_numerical(double theta_d_curr, double theta_d_prev, double sampling_period){
-//     double theta_dot_d = (theta_d_curr - theta_d_prev) / (sampling_period);
-//     return theta_dot_d;
-// }
+double RealWorldConfigurer::TauConvert(double tau_in_Nm_linkside, double gear_ratio, double torque_limit){
+    double tau_in_permil = this->Nm_to_permil(tau_in_Nm_linkside, gear_ratio);
+    double torque_permil = this->TorqueSaturation(tau_in_permil, torque_limit);
+    double torque_inverted = this->InvertTorquesign(torque_permil);
 
+    return torque_inverted;
+}
 
 //controller implementations
 
@@ -76,15 +55,14 @@ ManualController::ManualController() {
 
 int ManualController::calculateTau(int input_tau) {
     // Implement the calculation for tau
-    tau = torque_saturate(input_tau, 990); // Example max torque norm
-    return tau;
+    return input_tau;
 }
 
 
 PDController::PDController() {
     // Initialize gains
-    Kp_PD[0] = 0.0; Kp_PD[1] = 5500.0; 
-    Kd_PD[0] = 0.0; Kd_PD[1] = 1500.0; 
+    Kp_PD[0] = 5500.0; Kp_PD[1] = 0.0; 
+    Kd_PD[0] = 3500.0; Kd_PD[1] = 0.0; 
 }
 
 std::array<double,3> PDController::calculateTau(int index, double theta_desired_d, double theta_current, 
@@ -97,25 +75,11 @@ std::array<double,3> PDController::calculateTau(int index, double theta_desired_
     return {tau_propo[index], tau_deriv[index], tau[index]};
 }
 
-// //to develop
-// double PDController::tauPropo(int index, double joint_error) {
-//     tau_propo[index] = Kp_PD[index] * joint_error;
-//     // printf("\nin controller, generated torque is  : %f\n", tau[index]);
-//     tau_propo[index] = - torque_saturate(tau_propo[index], 2700);    
-//     return tau_propo[index];
-// }
-
-// double PDController::tauDeriv(int index, double joint_error_dot) {
-//     tau_deriv[index] = Kd_PD[index] * joint_error_dot;
-//     // printf("\nin controller, generated torque is  : %f\n", tau[index]);
-//     tau_deriv[index] = - torque_saturate(tau_deriv[index], 2700);    
-//     return tau_deriv[index];
-//}
 
 FLController::FLController() {
     // Initialize gains
-    Kp_FL[0] = 2500.0; Kp_FL[1] = 0.0;
-    Kd_FL[0] = 3500.0; Kd_FL[1] = 0.0;
+    Kp_FL[0] = 2500.0; Kp_FL[1] = 2500.0;
+    Kd_FL[0] = 3500.0; Kd_FL[1] = 300.0;
 }
 std::array<double, 4>FLController::calculateTau(
     std::array<double, 2> theta_current,
@@ -153,7 +117,7 @@ std::array<double, 4>FLController::calculateTau(
     
     tau[0] = m11 * (temp1) + m12 * (temp2) + h1; // Nm
     tau[1] = m21 * (temp1) + m22 * (temp2) + h2;
-    return {tau[0], tau[1], tau_nonlinear_term[0], tau_nonlinear_term[1]}; // in Nm, torque minus is required
+    return {tau[0], tau[1], tau_nonlinear_term[0], tau_nonlinear_term[1]}; // in Nm
 }
 
 
@@ -197,16 +161,16 @@ std::array<double, 2> DOBController::EstimateDisturbance(double theta1, double t
     double h1 = nonlinear_dynamics_term[0];
     double h2 = nonlinear_dynamics_term[1];
 
-    printf("m11 : {%f}\n", m11);
-    printf("m12 : {%f}\n", m12);
-    printf("m21 : {%f}\n", m21);
-    printf("m22 : {%f}\n", m22);
-    printf("h1 : {%f}\n", h1);
-    printf("h2 : {%f}\n", h2);
+    // printf("m11 : {%f}\n", m11);
+    // printf("m12 : {%f}\n", m12);
+    // printf("m21 : {%f}\n", m21);
+    // printf("m22 : {%f}\n", m22);
+    // printf("h1 : {%f}\n", h1);
+    // printf("h2 : {%f}\n", h2);
     
-    printf("y_a_prev[0] : {%f}\n", y_a_prev[0]);
-    printf("y_a_prev[1] : {%f}\n", y_a_prev[1]);
-    printf("y_b_dot[0] : {%f}\n", y_b_dot[0]);
+    // printf("y_a_prev[0] : {%f}\n", y_a_prev[0]);
+    // printf("y_a_prev[1] : {%f}\n", y_a_prev[1]);
+    // printf("y_b_dot[0] : {%f}\n", y_b_dot[0]);
     
     
     estimated_disturbance[0] = m11 * (y_b_dot[0]) + m12 * (y_b_dot[1]) + h1 - y_a[0];

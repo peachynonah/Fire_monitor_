@@ -12,9 +12,10 @@ class RealWorldConfigurer{
         RealWorldConfigurer();
 
     public:
-        double Nm_to_permil(double tau_in_Nm, double gear_ratio);
+        double Nm_to_permil(double tau_in_Nm_linkside, double gear_ratio);
         double TorqueSaturation(double torque_permil, double torque_limit);
         double InvertTorquesign(double torque_before_inverted);
+        double TauConvert(double tau_in_Nm_linkside, double gear_ratio, double torque_limit);
 
 };
 
