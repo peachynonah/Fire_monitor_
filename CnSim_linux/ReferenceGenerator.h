@@ -1,9 +1,9 @@
 #pragma once
 #include <array>
+#include <Eigen/Dense>
 
-#define clockwise 0
-#define anticlockwise 1
-
+#define reference_uprising 0
+#define reference_downfalling 1
 
 class ReferenceGenerator {
 
@@ -17,11 +17,11 @@ class ReferenceGenerator {
     public:
         // 생성자
         ReferenceGenerator();
-        std::array<double, 6> computeAlphaCoeffs(double time_ref_start_,
-                                                double time_ref_fin_,
-                                                std::array<double, 3> start_state_,
-                                                std::array<double, 3> final_state_
-                                                std::array<double, 6> alpha_coeffs_);
+        void computeAlphaCoeffs(double time_ref_start_,
+                                double time_ref_fin_,
+                                std::array<double, 3> start_state_,
+                                std::array<double, 3> final_state_
+                                /*std::array<double, 6> alpha_coeffs_*/);
 
         // 특정 시간 t에 대한 목표 위치를 계산
         double get_position(double current_time_,

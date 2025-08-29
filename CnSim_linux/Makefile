@@ -4,7 +4,7 @@ TARGET = cnSim
 OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp)) #./*.c
 CFLAGS = -W -Wall -g -O2 -std=c++11
 
-INCLUDE_DIR = -I.
+INCLUDE_DIR = -I. -I/usr/include/eigen3
 LIBS = -lpthread
 
 all : ${TARGET}
