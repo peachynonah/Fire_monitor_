@@ -9,3 +9,16 @@
 
 - csv_data: 각 trial의 csv data를 정리해놓은 폴더입니다. 각 trial의 parameter는 다음의 링크에서 확인할 수 있는 Notion 페이지에 있습니다.
 - https://www.notion.so/cdsl-uos-wiki/2536252d2a7d8047b271ee32672c7fcf?source=copy_link
+
+
+# 코드 설명
+- reference generator:
+  - 시작점과 끝점 위치를 가지고 end effector의 position, velocity, and accleration의 시간에 따른 reference를 생성하는 모듈입니다.
+  - 5차 polynomial로 reference를 생성하는 방법을 이용하였습니다.
+
+- model dynamics:
+  - classicial D-H parameter를 이용하여 2 link manipulator의 kinematics를 구하였습니다.
+  - 이 kinematics를 바탕으로 Euler-Lagrange equation을 통해 dynamics를 구하였습니다.
+
+- controller:
+  - 통신 및 기어비 등이 제공되었던 코드입니다. 
