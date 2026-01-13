@@ -10,7 +10,7 @@
 - csv_data: 각 trial의 csv data를 정리해놓은 폴더입니다. 각 trial의 parameter는 다음의 링크에서 확인할 수 있는 Notion 페이지에 있습니다.
 - https://www.notion.so/cdsl-uos-wiki/2536252d2a7d8047b271ee32672c7fcf?source=copy_link
 
-
+- model_dynamics_matlab: kinematics / dynamics 를 구하는 MATLAB 코드입니다.
 # 코드 설명
 - reference generator:
   - 시작점과 끝점 위치를 가지고 end effector의 position, velocity, and accleration의 시간에 따른 reference를 생성하는 모듈입니다.
