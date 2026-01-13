@@ -21,4 +21,6 @@
   - 이 kinematics를 바탕으로 Euler-Lagrange equation을 통해 dynamics를 구하였습니다.
 
 - controller:
-  - 통신 및 기어비 등이 제공되었던 코드입니다. 
+  - 통신 및 기어비 등은 존재했지만 control input은 비어있던 코드입니다. (Cnsim_linux_original을 확인하면 알 수 있음)
+  - PD controller, FL controller, DOB 가 본 코드 내에 각각의 함수로 구현되어 있습니다.
+  - 내부에서 controller mode 변경을 통해서 PD / FL / FL + DOB 제어로 변경할 수 있습니다.
